@@ -12,24 +12,12 @@ namespace TokenContext
         #endregion
 
         #region structs
-        [StructLayout(LayoutKind.Sequential)]
-        public struct LocalIdAndAttribute
-        {
-            public LUID Luid;
-            public int Attributes;
-        }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct LUID
         {
             public uint LowPart;
             public int HighPart;
-        }
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public struct LUID_AND_ATTRIBUTES
-        {
-            public LUID Luid;
-            public UInt32 Attributes;
         }
         [StructLayout(LayoutKind.Sequential)]
         public struct PROCESS_INFORMATION
@@ -67,12 +55,6 @@ namespace TokenContext
             public IntPtr hStdOutput;
             public IntPtr hStdError;
         }
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct STARTUPINFOEX
-        {
-            public STARTUPINFO StartupInfo;
-            public IntPtr lpAttributeList;
-        }
         [StructLayout(LayoutKind.Sequential)]
         public struct TOKEN_PRIVILEGES
         {
@@ -83,26 +65,6 @@ namespace TokenContext
         #endregion
 
         #region enums
-        [Flags]
-        enum CreateProcessFlags
-        {
-            CREATE_BREAKAWAY_FROM_JOB = 0x01000000,
-            CREATE_DEFAULT_ERROR_MODE = 0x04000000,
-            CREATE_NEW_CONSOLE = 0x00000010,
-            CREATE_NEW_PROCESS_GROUP = 0x00000200,
-            CREATE_NO_WINDOW = 0x08000000,
-            CREATE_PROTECTED_PROCESS = 0x00040000,
-            CREATE_PRESERVE_CODE_AUTHZ_LEVEL = 0x02000000,
-            CREATE_SEPARATE_WOW_VDM = 0x00000800,
-            CREATE_SHARED_WOW_VDM = 0x00001000,
-            CREATE_SUSPENDED = 0x00000004,
-            CREATE_UNICODE_ENVIRONMENT = 0x00000400,
-            DEBUG_ONLY_THIS_PROCESS = 0x00000002,
-            DEBUG_PROCESS = 0x00000001,
-            DETACHED_PROCESS = 0x00000008,
-            EXTENDED_STARTUPINFO_PRESENT = 0x00080000,
-            INHERIT_PARENT_AFFINITY = 0x00010000
-        }
         [Flags]
         public enum CreationFlags
         {
@@ -139,16 +101,6 @@ namespace TokenContext
         {
             LOGON_WITH_PROFILE = 0x00000001,
             LOGON_NETCREDENTIALS_ONLY = 0x00000002
-        }
-        enum LOGON_TYPE
-        {
-            LOGON32_LOGON_INTERACTIVE = 2,
-            LOGON32_LOGON_NETWORK,
-            LOGON32_LOGON_BATCH,
-            LOGON32_LOGON_SERVICE,
-            LOGON32_LOGON_UNLOCK = 7,
-            LOGON32_LOGON_NETWORK_CLEARTEXT,
-            LOGON32_LOGON_NEW_CREDENTIALS
         }
         public enum Logon32Type : int
         {
@@ -254,29 +206,8 @@ namespace TokenContext
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool CloseHandle(IntPtr hHandle);
 
-        //CreateProcessWithLogonW
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern bool CreateProcessWithLogonW(
-        String userName,
-        String domain,
-        String password,
-        LogonFlags logonFlags,
-        String applicationName,
-        String commandLine,
-        CreationFlags creationFlags,
-        UInt32 environment,
-        String currentDirectory,
-        ref STARTUPINFO startupInfo,
-        out PROCESS_INFORMATION processInformation);
-
         [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateProcessWithTokenW(IntPtr hToken, LogonFlags dwLogonFlags, string lpApplicationName, string lpCommandLine, CreationFlags dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
-
-
-        //DuplicateToken
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern int DuplicateToken(IntPtr hToken, int impersonationLevel,
-        ref IntPtr hNewToken);
 
         //DuplicateTokenEx
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
